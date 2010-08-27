@@ -7,7 +7,7 @@ import com.imediava.asistentesm2.domain.Jugador;
 
 public class FachadaBaseDatos {
 	
-	private static final String[] NOMBRES_BASES = { "Jose Manuel", "Ricard", "Sergio" };
+	private static final String[] NOMBRES_BASES = { "Jose", "Ricard", "Sergio" };
 	private static final String[] NOMBRES_ALEROS = { "La bomba", "Navarro", "El mejor" };
 	private static final String[] NOMBRES_PIVOTS = { "Marc", "Pau", "Felipón" };
 	

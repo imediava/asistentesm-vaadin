@@ -17,6 +17,7 @@ package com.imediava.asistentesm2;
 
 import java.util.Collection;
 
+
 import com.imediava.asistentesm2.database.stub.FachadaBaseDatos;
 import com.imediava.asistentesm2.domain.Jugador;
 import com.vaadin.Application;
@@ -46,15 +47,10 @@ public class MyVaadinApplication extends Application
 
 	private void insertarTablas(Window mainWindow) {
 		FachadaBaseDatos db = new FachadaBaseDatos();
-		Table tablaBases = crearRellenarTabla(db.getBases(),"Bases");
-		tablaBases.setPageLength(4);
-		Table tablaAleros = crearRellenarTabla(db.getAleros(), "Aleros");
-		tablaAleros.setPageLength(4);
-		Table tablaPivots = crearRellenarTabla(db.getPivots(), "Pivots");	
-		tablaPivots.setPageLength(4);
-		window.addComponent(tablaBases);
-		window.addComponent(tablaAleros);
-		window.addComponent(tablaPivots);
+		window.addComponent(crearRellenarTabla(db.getBases(),"Bases"));
+		window.addComponent(crearRellenarTabla(db.getAleros(), "Aleros"));
+		window.addComponent(crearRellenarTabla(db.getPivots(), "Pivots"));
+		
 	}
 
 	private Table crearRellenarTabla(Collection<Jugador> jugadores, String NombreTabla) {
@@ -69,6 +65,7 @@ public class MyVaadinApplication extends Application
 		for(Jugador j: jugadores){
 			container.addBean(j);
 		}
+		table.setPageLength(jugadores.size());
 		return table;
 	}
     
