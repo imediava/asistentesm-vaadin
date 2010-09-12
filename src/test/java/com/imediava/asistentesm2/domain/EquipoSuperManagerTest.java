@@ -1,6 +1,8 @@
 package com.imediava.asistentesm2.domain;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -17,12 +19,9 @@ import com.imediava.asistentesm2.domain.Jugador.PosicionJugador;
 
 public class EquipoSuperManagerTest {
 
-	private static final int EXCESO_PIVOTS = 5;
-	private static final int MAX_NUM_PIVOTS = 4;
-	private static final int EXCESO_DE_ALEROS = 5;
-	private static final int MAX_NUMERO_ALEROS = 4;
-	private static final int EXCESO_DE_BASES = 4;
-	private static final int MAX_NUM_BASES = 3;
+	private static final String NOMBRE_JUGADOR_EXTRA = "jugadorExtra";
+	private static final String ID_PRUEBA_JUGADOR_EXTRA = "ZZZ";
+	
 	private EquipoSuperManager miEquipoVacio;
 	private Collection<Jugador> misTresBases;
 	private Collection<Jugador> misCuatroBases;
@@ -35,12 +34,10 @@ public class EquipoSuperManagerTest {
 	@Before
 	public void setUp() throws Exception {
 		miEquipoVacio = new EquipoSuperManager();
-		misTresBases = crearGrupoJugadores(PosicionJugador.BASE, MAX_NUM_BASES);
-		misCuatroBases = crearGrupoJugadores(PosicionJugador.BASE, EXCESO_DE_BASES);
-		misCuatroAleros = crearGrupoJugadores(PosicionJugador.BASE, MAX_NUMERO_ALEROS);
-		misCincoAleros = crearGrupoJugadores(PosicionJugador.BASE, EXCESO_DE_ALEROS);
-		misCuatroPivots = crearGrupoJugadores(PosicionJugador.BASE, MAX_NUM_PIVOTS);
-		misCincoPivots = crearGrupoJugadores(PosicionJugador.BASE, EXCESO_PIVOTS);
+		misTresBases = crearGrupoJugadores(PosicionJugador.BASE, EquipoSuperManager.MAXIMO_NUMERO_BASES_EQUIPO);
+		misCuatroAleros = crearGrupoJugadores(PosicionJugador.ALERO, EquipoSuperManager.MAXIMO_NUMERO_ALEROS_EQUIPO);
+		misCuatroPivots = crearGrupoJugadores(PosicionJugador.PIVOT, EquipoSuperManager.MAXIMO_NUMERO_PIVOTS_EQUIPO);
+
 		
 	}
 	
@@ -66,10 +63,10 @@ public class EquipoSuperManagerTest {
 	 * @param posicion Posicion del jugador
 	 * @return Jugador creado
 	 */
-	private Jugador crearJugador(String ID, String nombre, PosicionJugador posicion) {
-		Jugador miJugador = new Jugador();
+	private Jugador crearJugador(String ID, String nombre, PosicionJugador pos) {
+		Jugador miJugador = new Jugador(ID);
 		miJugador.setNombre(nombre);
-		miJugador.setPosicion(PosicionJugador.BASE);
+		miJugador.setPosicion(pos);
 		return miJugador;
 	}
 
@@ -84,34 +81,92 @@ public class EquipoSuperManagerTest {
 		assertEquals(Integer.valueOf(properties.getProperty("DineroInicialDisponible")),miEquipoVacio.getDineroDisponible());
 	}
 	
+	// -- Agregando jugadores al limite
+	
 	@Test
 	public void annadirTresBasesTest(){
-		//TODO: Probar a añadir 3 bases
-		
-		// 1. Agrego los tres bases 
-		for(Jugador j:misTresBases){
-			 miEquipoVacio.addJugador(j);
-		 }
-		
-		// 2. Compruebo que los tres bases estan en el equipo
-		// miEquipoVacio.contains(misTresBases(0))
-		// miEquipoVacio.contains(misTresBases(1))
-		// miEquipoVacio.contains(misTresBases(2))
+		comprobarAgregarConjuntoJugadoresLimite(misTresBases);
+	}
+
+	@Test
+	public void annadirCuatroAlerosTest(){
+		comprobarAgregarConjuntoJugadoresLimite(misCuatroAleros);
 	}
 	
+	@Test
+	public void annadirCuatroPivotsTest(){
+		comprobarAgregarConjuntoJugadoresLimite(misCuatroPivots);
+	}
+
+	// Agregando jugadores en exceso
 	
 	@Test
 	public void annadirCuatroBasesTest(){
-		//TODO: Probar a añadir 4 bases (error)
-		
-		// 1. Agrego los cuatro bases 
-		// 2. Compruebo que salta excepcion cuando intento con el cuarto
+		comprobarAgregarExcesoJugadores(misTresBases, PosicionJugador.PIVOT);
+	}
+	
+	@Test
+	public void annadirCincoAlerosTest(){
+		comprobarAgregarExcesoJugadores(misCuatroAleros, PosicionJugador.BASE);
+	}
+	
+	@Test
+	public void annadirCincoPivotsTest(){
+		comprobarAgregarExcesoJugadores(misCuatroPivots, PosicionJugador.ALERO);
+	}
+
+
+	/**
+	 * Crea un jugador extra con una posicion y un id que depende
+	 * del parametro pos. 
+	 * 
+	 * OJO! Dos llamadas a este metodo para la misma
+	 * posicion crean el mismo jugador.
+	 * 
+	 * @param pos Posicion del jugador
+	 * @return Jugador extra creado
+	 */
+	private Jugador crearJugadorExtra(PosicionJugador pos) {
+		return crearJugador(ID_PRUEBA_JUGADOR_EXTRA + pos.toString(), NOMBRE_JUGADOR_EXTRA, pos);
 	}
 	
 	/**
-	 * TODO: Probar a añadir 4 aleros 
-	 * TODO: Probar a añadir 5 aleros (error) TODO:
-	 * Probar a añadir 4 pivots TODO: Probar a añadir 5 pivots(error)
+	 * Prueba que si se intenta agregar el numero maximo de jugadores
+	 * permitido de una posicion, los jugadores se agregan correctamente
+	 * y no ocurre ningun error.
+	 * 
+	 * @param jugadores Jugadores a agregar.
+	 */
+	private void comprobarAgregarConjuntoJugadoresLimite(Collection<? extends Jugador> jugadores) {
+		// 1. Agrego los tres bases 
+		miEquipoVacio.addAll(jugadores);
+		
+		// 2. Compruebo que los tres bases estan en el equipo
+		assertTrue(miEquipoVacio.containsAll(jugadores));
+	}
+	
+	/**
+	 * Prueba en que si se intenta agregar un numero de jugadores en 
+	 * exceso y que comprueba que solo se agregan los necesarios.
+	 * 
+	 * @param jugadores Jugadores a agregar.
+	 */
+	private void comprobarAgregarExcesoJugadores(Collection<Jugador> jugadores,PosicionJugador posJugExtra) {
+		//TODO: Probar a añadir 4 bases (error)
+		// 1. Agrego los cuatro bases 
+		miEquipoVacio.addAll(jugadores);
+		
+		// 2.  Compruebo
+		// Que no se puede agregar otro base
+		PosicionJugador posicionPrueba = jugadores.iterator().next().getPosicion();
+		assertFalse(miEquipoVacio.add(crearJugadorExtra(posicionPrueba)));
+		// Que el equipo solo tiene tres jugadores (los 3 bases agregados)
+		assertTrue(miEquipoVacio.size() == EquipoSuperManager.MAPA_MAX_JUGADORES_POSICION.get(posicionPrueba));
+		// Que si se puede agregar un alero
+		assertTrue(miEquipoVacio.add(crearJugadorExtra(posJugExtra)));
+	}
+	
+	/**
 	 * 
 	 * TODO: Probar a fichar con menos dinero que el que se tiene en caja TODO:
 	 * Probar a fichar con el dinero justo. TODO: Probar a fichar con mas dinero
@@ -123,6 +178,9 @@ public class EquipoSuperManagerTest {
 	 * 
 	 * TODO: Probar a intentar fichar a 4 no nacionales (error) TODO: Probar a
 	 * intentar fichar a 5 no nacionales (error)
+	 * 
+	 * TODO: Probar que  el método addJugador no permite dos fichajes
+	 * que se hacen concurrentemente y rompen las reglas
 	 * 
 	 */
 

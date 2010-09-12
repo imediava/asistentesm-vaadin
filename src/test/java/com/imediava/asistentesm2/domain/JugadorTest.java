@@ -13,9 +13,9 @@ public class JugadorTest {
 
 	@Before
 	public void setUp() throws Exception {
-		miJugador = new Jugador();
 		miID = "ACB";
-		miJugador.setID(miID);
+		miJugador = new Jugador(miID);
+		
 	}
 
 	@After

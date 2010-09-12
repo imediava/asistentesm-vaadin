@@ -26,7 +26,7 @@ public class FachadaBaseDatos {
 	private Collection<Jugador> generarColeccion(String[] nombres){
 		Collection<Jugador> bases = new ArrayList<Jugador>();
 		for (String nombre: nombres){
-			Jugador jug = new Jugador();
+			Jugador jug = new Jugador("ID");
 			jug.setNombre(nombre);
 			bases.add(jug);
 		}

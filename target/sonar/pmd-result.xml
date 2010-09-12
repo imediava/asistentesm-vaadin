@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pmd version="4.2.5" timestamp="2010-09-12T21:39:57.539">
+<file name="/home/imediava/Programas-StandAlone/eclipse-jee-helios-24-8-2010/workspace/asistentesm2/src/main/java/com/imediava/asistentesm2/MyVaadinApplication.java">
+<violation beginline="48" endline="54" begincolumn="17" endcolumn="9" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="com.imediava.asistentesm2" class="MyVaadinApplication" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused method parameters such as 'mainWindow'.
+</violation>
+</file>
+<file name="/home/imediava/Programas-StandAlone/eclipse-jee-helios-24-8-2010/workspace/asistentesm2/src/main/java/com/imediava/asistentesm2/domain/EquipoSuperManager.java">
+<violation beginline="58" endline="58" begincolumn="17" endcolumn="66" rule="ConstructorCallsOverridableMethod" ruleset="Design Rules" package="com.imediava.asistentesm2.domain" class="EquipoSuperManager" externalInfoUrl="http://pmd.sourceforge.net/rules/design.html#ConstructorCallsOverridableMethod" priority="3">
+Overridable method 'setDineroDisponible' called during object construction
+</violation>
+<violation beginline="86" endline="87" begincolumn="17" endcolumn="37" rule="IfStmtsMustUseBraces" ruleset="Braces Rules" package="com.imediava.asistentesm2.domain" class="EquipoSuperManager" method="esFichajeValido" externalInfoUrl="http://pmd.sourceforge.net/rules/braces.html#IfStmtsMustUseBraces" priority="3">
+Avoid using if statements without curly braces
+</violation>
+</file>
+<file name="/home/imediava/Programas-StandAlone/eclipse-jee-helios-24-8-2010/workspace/asistentesm2/src/main/java/com/imediava/asistentesm2/domain/Jugador.java">
+<violation beginline="117" endline="117" begincolumn="17" endcolumn="23" rule="IdempotentOperations" ruleset="Design Rules" package="com.imediava.asistentesm2.domain" class="Jugador" method="setId" externalInfoUrl="http://pmd.sourceforge.net/rules/design.html#IdempotentOperations" priority="3">
+Avoid idempotent operations (like assigning a variable to itself).
+</violation>
+</file>
+</pmd>

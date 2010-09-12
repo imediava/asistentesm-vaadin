@@ -90,7 +90,11 @@ public class Jugador {
 	 * ejemplo para acceder a la pagina con las estadisticas completas del
 	 * jugador en la mencionada web.
 	 */
-	private String ID = null;
+	private String id = null;
+	
+	public Jugador(String ID){
+		this.id = ID;
+	}
 
 	/**
 	 * Obtiene el codigo de identificador unico del jugador en la pagina web de
@@ -99,8 +103,8 @@ public class Jugador {
 	 * 
 	 * @return Identificador unico
 	 */
-	public String getID() {
-		return ID;
+	public String getId() {
+		return id;
 	}
 
 	/**
@@ -109,8 +113,8 @@ public class Jugador {
 	 * @param iD
 	 *            Codigo identificador
 	 */
-	public void setID(String iD) {
-		ID = iD;
+	public void setId(String id) {
+		id = id;
 	}
 
 	/**
@@ -120,7 +124,7 @@ public class Jugador {
 	 *         acb
 	 */
 	public String getPaginaWebJugadorEnWebACB() {
-		return PREFIJO_URL_JUGADOR_WEB_ACB + getID();
+		return PREFIJO_URL_JUGADOR_WEB_ACB + getId();
 	}
 
 	/**
@@ -278,7 +282,7 @@ public class Jugador {
 	public boolean equals(Object o1, Object o2){
 		Jugador j1 = (Jugador)o1;
 		Jugador j2 = (Jugador)o2;
-		return j1.getID().equalsIgnoreCase(j2.getID());
+		return j1.getId().equalsIgnoreCase(j2.getId());
 	}
 
 }

@@ -1,0 +1,11 @@
+.v-captiontext {
+	background:none repeat scroll 0 0 #C2C3C4;
+	float:left;
+	font-size:12px;
+	font-weight:bold;
+	overflow:hidden;
+	text-align:center;
+	text-transform:uppercase;
+	vertical-align:middle;
+	width:833px;
+}
