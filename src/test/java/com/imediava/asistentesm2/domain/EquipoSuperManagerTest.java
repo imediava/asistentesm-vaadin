@@ -19,16 +19,14 @@ import com.imediava.asistentesm2.domain.Jugador.PosicionJugador;
 
 public class EquipoSuperManagerTest {
 
+	private static final int COSTE_CERO = 0;
 	private static final String NOMBRE_JUGADOR_EXTRA = "jugadorExtra";
 	private static final String ID_PRUEBA_JUGADOR_EXTRA = "ZZZ";
 	
 	private EquipoSuperManager miEquipoVacio;
 	private Collection<Jugador> misTresBases;
-	private Collection<Jugador> misCuatroBases;
 	private Collection<Jugador> misCuatroAleros;
-	private Collection<Jugador> misCincoAleros;
 	private Collection<Jugador> misCuatroPivots;
-	private Collection<Jugador> misCincoPivots;
 	
 	
 	@Before
@@ -37,7 +35,6 @@ public class EquipoSuperManagerTest {
 		misTresBases = crearGrupoJugadores(PosicionJugador.BASE, EquipoSuperManager.MAXIMO_NUMERO_BASES_EQUIPO);
 		misCuatroAleros = crearGrupoJugadores(PosicionJugador.ALERO, EquipoSuperManager.MAXIMO_NUMERO_ALEROS_EQUIPO);
 		misCuatroPivots = crearGrupoJugadores(PosicionJugador.PIVOT, EquipoSuperManager.MAXIMO_NUMERO_PIVOTS_EQUIPO);
-
 		
 	}
 	
@@ -124,10 +121,13 @@ public class EquipoSuperManagerTest {
 	 * posicion crean el mismo jugador.
 	 * 
 	 * @param pos Posicion del jugador
+	 * @param precioJugador Precio que se va a dar al jugador creado
 	 * @return Jugador extra creado
 	 */
-	private Jugador crearJugadorExtra(PosicionJugador pos) {
-		return crearJugador(ID_PRUEBA_JUGADOR_EXTRA + pos.toString(), NOMBRE_JUGADOR_EXTRA, pos);
+	private Jugador crearJugadorExtra(PosicionJugador pos, int precioJugador) {
+		Jugador jugador = crearJugador(ID_PRUEBA_JUGADOR_EXTRA + pos.toString(), NOMBRE_JUGADOR_EXTRA, pos);
+		jugador.setPrecio(precioJugador);
+		return jugador;
 	}
 	
 	/**
@@ -159,18 +159,79 @@ public class EquipoSuperManagerTest {
 		// 2.  Compruebo
 		// Que no se puede agregar otro base
 		PosicionJugador posicionPrueba = jugadores.iterator().next().getPosicion();
-		assertFalse(miEquipoVacio.add(crearJugadorExtra(posicionPrueba)));
+		assertFalse(miEquipoVacio.add(crearJugadorExtra(posicionPrueba, COSTE_CERO)));
 		// Que el equipo solo tiene tres jugadores (los 3 bases agregados)
 		assertTrue(miEquipoVacio.size() == EquipoSuperManager.MAPA_MAX_JUGADORES_POSICION.get(posicionPrueba));
 		// Que si se puede agregar un alero
-		assertTrue(miEquipoVacio.add(crearJugadorExtra(posJugExtra)));
+		assertTrue(miEquipoVacio.add(crearJugadorExtra(posJugExtra, COSTE_CERO)));
+	}
+	
+	@Test
+	public void dineroDisponibleAumentaAlVenderJugadorTest(){
+		int precioJugador = miEquipoVacio.getDineroDisponible() -1;
+		Jugador jugadorPrecioBarato = crearJugadorExtra(PosicionJugador.ALERO, precioJugador);
+		// Se comprueba que el jugador se ha fichado correctamente
+		assertTrue(equipoAceptaFichaje(miEquipoVacio, jugadorPrecioBarato));
+		
+		int dineroTrasFichaje = miEquipoVacio.getDineroDisponible();
+		// Se elimina el jugador
+		assertTrue(miEquipoVacio.remove(jugadorPrecioBarato));
+		// Se comprueba que el dinero es el correcto
+		assertEquals(dineroTrasFichaje + precioJugador, miEquipoVacio.getDineroDisponible());
+	}
+	
+	@Test
+	public void dineroDisponibleDisminuyeAlFicharTest(){
+		int precioJugador = miEquipoVacio.getDineroDisponible() -1;
+		int dineroDisponibleInicial = miEquipoVacio.getDineroDisponible();
+		Jugador jugadorPrecioBarato = crearJugadorExtra(PosicionJugador.ALERO, precioJugador);
+		// Se comprueba que el jugador se ha fichado correctamente
+		assertTrue(equipoAceptaFichaje(miEquipoVacio, jugadorPrecioBarato));
+		// Se comprueba que el dinero del equipo ha disminuido
+		assertEquals(dineroDisponibleInicial-precioJugador,miEquipoVacio.getDineroDisponible());
+	}
+	
+	
+	@Test
+	public void intentarFicharConDineroSobraTest(){
+		Jugador jugadorPrecioBarato = crearJugadorExtra(PosicionJugador.ALERO, miEquipoVacio.getDineroDisponible() -1);
+		assertTrue(equipoAceptaFichaje(miEquipoVacio, jugadorPrecioBarato));
+	}
+	
+	@Test
+	public void intentarFicharConDineroJustoTest(){
+		Jugador jugadorPrecioExacto = crearJugadorExtra(PosicionJugador.ALERO, miEquipoVacio.getDineroDisponible());
+		assertTrue(equipoAceptaFichaje(miEquipoVacio, jugadorPrecioExacto));
+	}
+	
+	@Test
+	public void intentarFicharSinDineroSuficienteTest(){
+		Jugador jugadorCaro = crearJugadorExtra(PosicionJugador.ALERO,miEquipoVacio.getDineroDisponible() + 1);
+		assertFalse(equipoAceptaFichaje(miEquipoVacio,jugadorCaro));
+	}
+	
+	@Test
+	public void intentarEliminarJugadorInexistente(){
+		Jugador jugadorCaro = crearJugadorExtra(PosicionJugador.ALERO,miEquipoVacio.getDineroDisponible() + 1);
+		//Comprueba que no se puede eliminar un jugador de un equipo si no pertenece al mismo
+		assertFalse(miEquipoVacio.remove(jugadorCaro));
+	}
+
+	/**
+	 * Devuelve si el equipo acepta el fichaje del jugador y comprueba
+	 * si ese fichaje se puede realizar probando distintos métodos
+	 * de la interfaz de la clase EquipoSupermanager.
+	 * 
+	 * @param equipo Equipo al que se agregará el jugador
+	 * @param jugadorCaro Jugador a agregar
+	 * @return
+	 */
+	private boolean equipoAceptaFichaje(EquipoSuperManager equipo, Jugador jugadorCaro) {
+		int numeroJugadoresEquipo = equipo.size();
+		return equipo.esFichajeValido(jugadorCaro) &&  equipo.add(jugadorCaro) && equipo.size() == numeroJugadoresEquipo + 1;
 	}
 	
 	/**
-	 * 
-	 * TODO: Probar a fichar con menos dinero que el que se tiene en caja TODO:
-	 * Probar a fichar con el dinero justo. TODO: Probar a fichar con mas dinero
-	 * del que se tiene en caja
 	 * 
 	 * 
 	 * TODO: Probar intentar fichar a 2 no europeos TODO: Probar a intentar

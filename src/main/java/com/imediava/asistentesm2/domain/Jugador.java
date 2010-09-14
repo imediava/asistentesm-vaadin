@@ -71,7 +71,7 @@ public class Jugador {
 	/**
 	 * Precio actual del jugador.
 	 */
-	private Integer precio;
+	private Integer precio = 0;
 
 	/**
 	 * Posicion del jugador (base, alero o pivot).
@@ -92,8 +92,8 @@ public class Jugador {
 	 */
 	private String id = null;
 	
-	public Jugador(String ID){
-		this.id = ID;
+	public Jugador(String id){
+		this.id = id;
 	}
 
 	/**
@@ -114,7 +114,7 @@ public class Jugador {
 	 *            Codigo identificador
 	 */
 	public void setId(String id) {
-		id = id;
+		this.id = id;
 	}
 
 	/**

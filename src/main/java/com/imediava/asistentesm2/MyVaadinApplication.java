@@ -33,12 +33,11 @@ import com.vaadin.ui.Window;
 @SuppressWarnings("serial")
 public class MyVaadinApplication extends Application
 {
-    private Window window;
-
+   
     @Override
     public void init()
     {
-        window = new Window("My Vaadin Application");
+        Window window = new Window("My Vaadin Application");
         setMainWindow(window);
         window.addComponent(new Button("Click Me"));
         insertarTablas(window);
@@ -47,9 +46,9 @@ public class MyVaadinApplication extends Application
 
 	private void insertarTablas(Window mainWindow) {
 		FachadaBaseDatos db = new FachadaBaseDatos();
-		window.addComponent(crearRellenarTabla(db.getBases(),"Bases"));
-		window.addComponent(crearRellenarTabla(db.getAleros(), "Aleros"));
-		window.addComponent(crearRellenarTabla(db.getPivots(), "Pivots"));
+		mainWindow.addComponent(crearRellenarTabla(db.getBases(),"Bases"));
+		mainWindow.addComponent(crearRellenarTabla(db.getAleros(), "Aleros"));
+		mainWindow.addComponent(crearRellenarTabla(db.getPivots(), "Pivots"));
 		
 	}
 

@@ -49,7 +49,7 @@ public class EquipoSuperManager extends AbstractSet<Jugador> {
 	 * @param dineroDisponible
 	 *            the dineroDisponible to set
 	 */
-	public void setDineroDisponible(Integer dineroDisponible) {
+	public final void setDineroDisponible(Integer dineroDisponible) {
 		this.dineroDisponible = dineroDisponible;
 	}
 
@@ -83,10 +83,7 @@ public class EquipoSuperManager extends AbstractSet<Jugador> {
 	 * @return Devuelve si el jugador se puede fichar o no
 	 */
 	public boolean esFichajeValido(Jugador jugador) {
-		if (superaLimiteJugadores(jugador))
-			return false;
-
-		return true;
+		return !superaLimiteJugadores(jugador) && !(jugador.getPrecio() > this.getDineroDisponible()); 
 	}
 
 	public static final int MAXIMO_NUMERO_BASES_EQUIPO = 3;
@@ -129,8 +126,28 @@ public class EquipoSuperManager extends AbstractSet<Jugador> {
 		if (valido) {
 			jugadores.add(jugador);
 		}
+		this.setDineroDisponible(getDineroDisponible() - jugador.getPrecio());
 		return valido;
 
+	}
+	
+	/**
+	 * Elimina al jugador del equipo.
+	 * 
+	 * @param jugador
+	 *            Jugador a eliminar
+	 * @return Si el jugador se ha podido eliminar o no
+	 */
+	@Override
+	public synchronized boolean remove(Object jugador) {
+		
+		if (jugador instanceof Jugador && contains((Jugador)jugador)){
+			Jugador j = (Jugador)jugador;
+			jugadores.remove(j);
+			setDineroDisponible(getDineroDisponible() + j.getPrecio());
+			return true;
+		}
+		return false;
 	}
 
 	/**
