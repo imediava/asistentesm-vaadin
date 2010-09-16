@@ -11,7 +11,9 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
+import com.imediava.asistentesm2.domain.Jugador.Nacionalidad;
 import com.imediava.asistentesm2.domain.Jugador.PosicionJugador;
+import com.imediava.asistentesm2.domain.rules.PredicadoNacionalidadJugador;
 import com.imediava.asistentesm2.domain.rules.PredicadoPosicionJugador;
 
 /**
@@ -22,6 +24,7 @@ import com.imediava.asistentesm2.domain.rules.PredicadoPosicionJugador;
  */
 public class EquipoSuperManager extends AbstractSet<Jugador> {
 
+	public static final int MAXIMO_NUMERO_EXTRACOMUNITARIOS = 2;
 	/**
 	 * Dinero en caja disponible del equipo para fichajes.
 	 */
@@ -83,7 +86,33 @@ public class EquipoSuperManager extends AbstractSet<Jugador> {
 	 * @return Devuelve si el jugador se puede fichar o no
 	 */
 	public boolean esFichajeValido(Jugador jugador) {
-		return !superaLimiteJugadores(jugador) && !(jugador.getPrecio() > this.getDineroDisponible()); 
+		return !superaLimiteJugadores(jugador)
+				&& !(jugador.getPrecio() > this.getDineroDisponible())
+				&& !ficharJugadorSuperaLimiteExtracomunitarios(jugador)
+				&& !ficharJugadorSuperaLimiteNoNacionales(jugador);
+	}
+
+	
+	/**
+	 * Comprueba si al fichar a un jugador se supera el maximo
+	 * numero de jugadores no nacionales.
+	 * 
+	 * @param jugador Jugador a fichar
+	 * @return
+	 */
+	private boolean ficharJugadorSuperaLimiteNoNacionales(Jugador jugador) {
+		return jugador.getStatusNacionalidad() != Nacionalidad.NACIONAL && obtenerNumeroJugadoresNoNacionales() >= MAXIMO_NUMERO_NO_NACIONALES;
+	}
+
+	/**
+	 * Comprueba si al fichar a un jugador se supera el maximo
+	 * numero de jugadores extracomunitarios.
+	 * 
+	 * @param jugador Jugador a fichar
+	 * @return
+	 */
+	private boolean ficharJugadorSuperaLimiteExtracomunitarios(Jugador jugador) {
+		return jugador.getStatusNacionalidad() == Nacionalidad.EXTRACOMUNITARIO && obtenerNumeroJugadoresExtraComunitarios() >= MAXIMO_NUMERO_EXTRACOMUNITARIOS;
 	}
 
 	public static final int MAXIMO_NUMERO_BASES_EQUIPO = 3;
@@ -94,6 +123,8 @@ public class EquipoSuperManager extends AbstractSet<Jugador> {
 			.of(PosicionJugador.BASE, MAXIMO_NUMERO_BASES_EQUIPO,
 					PosicionJugador.ALERO, MAXIMO_NUMERO_ALEROS_EQUIPO,
 					PosicionJugador.PIVOT, MAXIMO_NUMERO_PIVOTS_EQUIPO);
+
+	public static final int MAXIMO_NUMERO_NO_NACIONALES = 7;
 
 	/**
 	 * Devuelve si el agregar al jugador al equipo supondria sobrepasar el
@@ -130,7 +161,7 @@ public class EquipoSuperManager extends AbstractSet<Jugador> {
 		return valido;
 
 	}
-	
+
 	/**
 	 * Elimina al jugador del equipo.
 	 * 
@@ -140,9 +171,9 @@ public class EquipoSuperManager extends AbstractSet<Jugador> {
 	 */
 	@Override
 	public synchronized boolean remove(Object jugador) {
-		
-		if (jugador instanceof Jugador && contains((Jugador)jugador)){
-			Jugador j = (Jugador)jugador;
+
+		if (jugador instanceof Jugador && contains((Jugador) jugador)) {
+			Jugador j = (Jugador) jugador;
 			jugadores.remove(j);
 			setDineroDisponible(getDineroDisponible() + j.getPrecio());
 			return true;
@@ -200,6 +231,33 @@ public class EquipoSuperManager extends AbstractSet<Jugador> {
 	 */
 	public Set<Jugador> obtenerJugadoresPosicion(PosicionJugador pos) {
 		return Sets.filter(jugadores, new PredicadoPosicionJugador(pos));
+	}
+
+	/**
+	 * Devuelve el numero de jugadores extracomunitarios en el equipo.
+	 * 
+	 * @return Numero de jugadores extracomunitarios
+	 */
+	private int obtenerNumeroJugadoresExtraComunitarios() {
+		return Sets
+				.filter(jugadores,
+						new PredicadoNacionalidadJugador(
+								Nacionalidad.EXTRACOMUNITARIO)).size();
+	}
+
+	/**
+	 * Devuelve el numero de jugadores no nacionales en el equipo.
+	 * 
+	 * @return Numero de jugadores no nacionales
+	 */
+	private int obtenerNumeroJugadoresNoNacionales() {
+		return Sets
+				.filter(jugadores,
+						new PredicadoNacionalidadJugador(
+								Nacionalidad.EXTRACOMUNITARIO)).size()
+				+ Sets.filter(jugadores,
+						new PredicadoNacionalidadJugador(Nacionalidad.EUROPEO))
+						.size();
 	}
 
 }
